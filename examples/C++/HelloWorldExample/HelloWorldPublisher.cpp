@@ -38,14 +38,16 @@ bool HelloWorldPublisher::init()
 	m_Hello.index(0);
 	m_Hello.message("HelloWorld");
 	ParticipantAttributes PParam;
+	PParam.rtps.builtin.domainId = 70;
+	/*
 	PParam.rtps.defaultSendPort = 11511;
 	PParam.rtps.use_IP6_to_send = true;
 	PParam.rtps.builtin.use_SIMPLE_RTPSParticipantDiscoveryProtocol = true;
 	PParam.rtps.builtin.use_SIMPLE_EndpointDiscoveryProtocol = true;
 	PParam.rtps.builtin.m_simpleEDP.use_PublicationReaderANDSubscriptionWriter = true;
 	PParam.rtps.builtin.m_simpleEDP.use_PublicationWriterANDSubscriptionReader = true;
-	PParam.rtps.builtin.domainId = 80;
 	PParam.rtps.builtin.leaseDuration = c_TimeInfinite;
+	*/
 	PParam.rtps.setName("Participant_pub");
 	mp_participant = Domain::createParticipant(PParam);
 
@@ -57,17 +59,18 @@ bool HelloWorldPublisher::init()
 
 	//CREATE THE PUBLISHER
 	PublisherAttributes Wparam;
-	Wparam.topic.topicKind = NO_KEY;
+	//Wparam.topic.topicKind = NO_KEY;
 	Wparam.topic.topicDataType = "HelloWorld";
 	Wparam.topic.topicName = "HelloWorldTopic";
-	Wparam.topic.historyQos.kind = KEEP_LAST_HISTORY_QOS;
-	Wparam.topic.historyQos.depth = 30;
-	Wparam.topic.resourceLimitsQos.max_samples = 50;
-	Wparam.topic.resourceLimitsQos.allocated_samples = 20;
-	Wparam.times.heartbeatPeriod.seconds = 2;
-	Wparam.times.heartbeatPeriod.fraction = 200*1000*1000;
+	Wparam.topic.historyQos.kind = KEEP_ALL_HISTORY_QOS;
+	Wparam.topic.historyQos.depth = 10;
+	//Wparam.topic.resourceLimitsQos.max_samples = 5;
+	//Wparam.topic.resourceLimitsQos.allocated_samples = 20;
+	//Wparam.times.heartbeatPeriod.seconds = 2;
+	//Wparam.times.heartbeatPeriod.fraction = 200*1000*1000;
+	//Wparam.qos.m_durability.kind = VOLATILE_DURABILITY_QOS;
 	Wparam.qos.m_reliability.kind = RELIABLE_RELIABILITY_QOS;
-	mp_publisher = Domain::createPublisher(mp_participant,Wparam,(PublisherListener*)&m_listener);
+	mp_publisher = Domain::createPublisher(mp_participant,Wparam,NULL);//(PublisherListener*)&m_listener);
 	if(mp_publisher == nullptr)
 		return false;
 
@@ -97,7 +100,7 @@ void HelloWorldPublisher::PubListener::onPublicationMatched(Publisher* /*pub*/,M
 
 void HelloWorldPublisher::run(uint32_t samples)
 {
-	for(uint32_t i = 0;i<samples;++i)
+	for(uint32_t i = 0;i<10000;++i)
 	{
 		if(!publish())
 			--i;
@@ -105,13 +108,13 @@ void HelloWorldPublisher::run(uint32_t samples)
 		{
 			cout << "Message: "<<m_Hello.message()<< " with index: "<< m_Hello.index()<< " SENT"<<endl;
 		}
-		eClock::my_sleep(25);
+		eClock::my_sleep(0.0000001);
 	}
 }
 
 bool HelloWorldPublisher::publish()
 {
-	if(m_listener.n_matched>0)
+	if(1)//m_listener.n_matched>0)
 	{
 		m_Hello.index(m_Hello.index()+1);
 		mp_publisher->write((void*)&m_Hello);
