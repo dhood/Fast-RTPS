@@ -14,6 +14,7 @@
 
 include(${PROJECT_SOURCE_DIR}/cmake/dev/compile_example.cmake)
 compile_example(DeadlineQoSExample C++/DeadlineQoSExample USE_BOOST)
+compile_example(DeadlineQoSExample C++/DeadlineQoSExample USE_BOOST)
 compile_example(OwnershipStrengthQoSExample C++/OwnershipStrengthQoSExample USE_BOOST)
 compile_example(HelloWorldExample C++/HelloWorldExample)
 compile_example(FilteringExample C++/Filtering)
